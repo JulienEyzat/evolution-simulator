@@ -7,16 +7,15 @@ import environment
 
 class Game:
     def __init__(self):
-        self.max_x = 30
-        self.max_y = 30
-        self.environment = environment.Environment(self.max_x, self.max_y)
+        self.environment = environment.Environment()
 
     def plot_game(self):
         plt.cla()
         animals_x = [ current_animal.x for current_animal in self.environment.animals ]
         animals_y = [ current_animal.y for current_animal in self.environment.animals ]
         animals_color = [ current_animal.carnivorism for current_animal in self.environment.animals ]
-        # print(animals_color)
+        # print(len([ carnivorism for carnivorism in animals_color if carnivorism > 0.5 ]))
+        # print(len([ carnivorism for carnivorism in animals_color if carnivorism <= 0.5 ]))
         plt.scatter(x=animals_x, y=animals_y, c=animals_color)
         plt.imshow(self.environment.grass)
         plt.pause(0.1)
