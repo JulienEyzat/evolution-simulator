@@ -1,12 +1,12 @@
 import random
 
 class Animal():
-    def __init__(self, x, y):
+    def __init__(self, x, y, hunger_health_loss=0.1):
         self.x = x
         self.y = y
-        self.max_movement = 5
+        self.max_movement = 2
         self.health = 1
-        self.hunger_health_loss = 0.1
+        self.hunger_health_loss = hunger_health_loss
         self.regenerated_health = 0.01
     
     def move(self, x, y):
