@@ -1,13 +1,18 @@
 import random
 
 class Animal():
-    def __init__(self, x, y, hunger_health_loss=0.1):
+    def __init__(self, x, y, carnivorism=0):
         self.x = x
         self.y = y
         self.max_movement = 2
         self.health = 1
-        self.hunger_health_loss = hunger_health_loss
-        self.regenerated_health = 0.01
+        self.hunger_health_loss = 0.1
+        self.carnivorism = carnivorism
+        self.eaten_grass_quantity = 1 - self.carnivorism
+        if self.carnivorism >= 0.5:
+            self.regenerated_health = 0.5
+        else:
+            self.regenerated_health = 0.05
     
     def move(self, x, y):
         self.x = x
