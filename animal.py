@@ -7,21 +7,18 @@ class Animal():
         self.max_movement = 2
 
         self.carnivorism = carnivorism
-        if self.carnivorism < 0.1:
-            self.eaten_grass_quantity = 0.1
-        else:
-            self.eaten_grass_quantity = 1 - self.carnivorism
+        self.eaten_grass_quantity = 0.4
 
         self.satiation = 1
-        self.satiation_loss = 0.1
+        self.satiation_loss = 0.75 - self.carnivorism*0.5
         if self.carnivorism >= 0.5:
             self.satiation_gain = 1
         else:
             self.satiation_gain = 0.15
 
         self.health = 1
-        self.health_loss = 0.5
-        self.health_gain = 0.01
+        self.health_loss = 0.2
+        self.health_gain = 0.05
 
     def loss_satiation(self):
         self.satiation -= self.satiation_loss
@@ -47,16 +44,7 @@ class Animal():
         self.x = x
         self.y = y
 
-    def generate_random_movement(self, max_x, max_y):
+    def generate_random_movement(self):
         new_x = self.x + random.randint(-self.max_movement, self.max_movement)
-        if new_x >= max_x:
-            new_x = max_x - 1
-        elif new_x < 0:
-            new_x = 0
         new_y = self.y + random.randint(-self.max_movement, self.max_movement)
-        if new_y >= max_y:
-            new_y = max_y - 1
-        elif new_y < 0:
-            new_y = 0
-
-        self.move(new_x, new_y)
+        return new_x, new_y

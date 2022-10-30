@@ -6,13 +6,14 @@ import animal
 
 class Environment():
     def __init__(self):
-        self.x_size = 30
-        self.y_size = 30
-        self.regenerated_grass_quantity = 0.003
+        self.x_size = 15
+        self.y_size = 15
+        self.regenerated_grass_quantity = 0.2
         self.nb_animals = 30
 
         self.mutation_factor = 0.8
-        self.similarity_factor = 0.1
+        self.similarity_factor = 0.2
+        self.reproduction_factor = 0.5
 
         self.grass = np.ones((self.x_size, self.y_size))
         self.animals = [ self.generate_animal() for i in range(self.nb_animals) ]
@@ -35,10 +36,22 @@ class Environment():
         # Animals die
         self.animal_die()
 
+    def can_move(self, new_x, new_y):
+        if new_x >= self.x_size or new_x < 0:
+            return False
+        if new_y >= self.y_size or new_y < 0:
+            return False
+        number_of_animals_on_expected_pos = len([ 1 for current_animal in self.animals if current_animal.x == new_x and current_animal.y == new_y ])
+        if number_of_animals_on_expected_pos > 2:
+            return False
+        return True
+
     def animal_movement(self):
         for index, current_animal in enumerate(self.animals):
-            current_animal.generate_random_movement(self.x_size, self.y_size)
-    
+            new_x, new_y = current_animal.generate_random_movement()
+            if self.can_move(new_x, new_y):
+                current_animal.move(new_x, new_y)
+
     def generate_animal(self, parents=None):
         if parents:
             x = parents[0].x
@@ -49,9 +62,9 @@ class Environment():
             elif carnivorism > 1:
                 carnivorism = 1
         else:
-            x = random.randint(0, self.x_size)
-            y = random.randint(0, self.y_size)
-            carnivorism = 0
+            x = random.randint(0, self.x_size-1)
+            y = random.randint(0, self.y_size-1)
+            carnivorism = 0.1
         return animal.Animal(x, y, carnivorism=carnivorism)
 
     def get_dict_animals_on_same_position(self):
@@ -72,7 +85,11 @@ class Environment():
         duplicated_animals = self.get_dict_animals_on_same_position()
         # Reproduce animals
         for (x, y), to_reproduce_animals in duplicated_animals.items():
-            if self.are_animals_similar(to_reproduce_animals) and to_reproduce_animals[0].satiation == 1 and to_reproduce_animals[1].satiation == 1:
+            satiation_cond = to_reproduce_animals[0].satiation == 1 and to_reproduce_animals[1].satiation == 1
+            reproduction_cond = random.random() >= self.reproduction_factor
+            similarity_cond = self.are_animals_similar(to_reproduce_animals)
+            number_cond = len(to_reproduce_animals) == 2
+            if similarity_cond and satiation_cond and number_cond and reproduction_cond:
                 self.animals.append(self.generate_animal(to_reproduce_animals))
                 self.nb_animals += 1
 
@@ -89,10 +106,10 @@ class Environment():
         duplicated_animals = self.get_dict_animals_on_same_position()
         # Fight
         for (x, y), to_fight_animals in duplicated_animals.items():
-            if to_fight_animals[0].carnivorism > to_fight_animals[1].carnivorism and to_fight_animals[0].carnivorism > 0.5:
+            if to_fight_animals[0].carnivorism > to_fight_animals[1].carnivorism and to_fight_animals[0].carnivorism > 0.5 and to_fight_animals[1].carnivorism < 0.5:
                 to_fight_animals[1].health = 0
                 to_fight_animals[0].gain_satiation()
-            elif to_fight_animals[1].carnivorism > to_fight_animals[0].carnivorism and to_fight_animals[1].carnivorism > 0.5:
+            elif to_fight_animals[1].carnivorism > to_fight_animals[0].carnivorism and to_fight_animals[1].carnivorism > 0.5 and to_fight_animals[0].carnivorism < 0.5:
                 to_fight_animals[0].health = 0
                 to_fight_animals[1].gain_satiation()
                 
