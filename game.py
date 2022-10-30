@@ -20,7 +20,9 @@ class Game:
         texts = {
             "Nb tours": self.i,
             "Nb carnivors": len([ carnivorism for carnivorism in animals_color if carnivorism > 0.5 ]),
-            "Nb herbivors": len([ carnivorism for carnivorism in animals_color if carnivorism <= 0.5 ])
+            "Nb herbivors": len([ carnivorism for carnivorism in animals_color if carnivorism <= 0.5 ]),
+            "Mean carnivorism": np.mean(animals_color),
+            "Std carnivorism": np.std(animals_color)
         }
         i = 0
         for key, value in texts.items():

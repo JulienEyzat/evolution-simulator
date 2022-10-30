@@ -7,14 +7,14 @@ class Animal():
         self.max_movement = 2
 
         self.carnivorism = carnivorism
-        self.eaten_grass_quantity = 0.4
+        self.eaten_grass_quantity = 0.6 - self.carnivorism
+        if self.eaten_grass_quantity < 0:
+            self.eaten_grass_quantity = 0
 
         self.satiation = 1
         self.satiation_loss = 0.75 - self.carnivorism*0.5
-        if self.carnivorism >= 0.5:
-            self.satiation_gain = 1
-        else:
-            self.satiation_gain = 0.15
+        self.satiation_grass_gain = 1 - self.carnivorism
+        self.satiation_animal_gain = self.carnivorism
 
         self.health = 1
         self.health_loss = 0.2
@@ -25,8 +25,11 @@ class Animal():
         if self.satiation < 0:
             self.satiation = 0
 
-    def gain_satiation(self):
-        self.satiation += self.satiation_gain
+    def gain_satiation(self, food_type):
+        if food_type == "grass":
+            self.satiation += self.satiation_grass_gain
+        elif food_type == "animal":
+            self.satiation += self.satiation_animal_gain
         if self.satiation > 1:
             self.satiation = 1
 

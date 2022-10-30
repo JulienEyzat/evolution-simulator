@@ -8,12 +8,12 @@ class Environment():
     def __init__(self):
         self.x_size = 15
         self.y_size = 15
-        self.regenerated_grass_quantity = 0.2
+        self.regenerated_grass_quantity = 0.1
         self.nb_animals = 30
 
-        self.mutation_factor = 0.8
-        self.similarity_factor = 0.2
-        self.reproduction_factor = 0.5
+        self.mutation_factor = 0.2
+        self.similarity_factor = 0.1
+        self.reproduction_factor = 0.2
 
         self.grass = np.ones((self.x_size, self.y_size))
         self.animals = [ self.generate_animal() for i in range(self.nb_animals) ]
@@ -95,9 +95,9 @@ class Environment():
 
     def animal_eating_grass(self):
         for index, current_animal in enumerate(self.animals):
-            if current_animal.carnivorism < 0.5 and self.grass[current_animal.y, current_animal.x] >= current_animal.eaten_grass_quantity:
+            if current_animal.eaten_grass_quantity > 0 and self.grass[current_animal.y, current_animal.x] >= current_animal.eaten_grass_quantity:
                 self.grass[current_animal.y, current_animal.x] -= current_animal.eaten_grass_quantity
-                current_animal.gain_satiation()
+                current_animal.gain_satiation("grass")
             else:
                 current_animal.loss_satiation()
 
@@ -105,17 +105,19 @@ class Environment():
         # Get list of animals to fight
         duplicated_animals = self.get_dict_animals_on_same_position()
         # Fight
-        for (x, y), to_fight_animals in duplicated_animals.items():
-            if to_fight_animals[0].carnivorism > to_fight_animals[1].carnivorism and to_fight_animals[0].carnivorism > 0.5 and to_fight_animals[1].carnivorism < 0.5:
+        for _, to_fight_animals in duplicated_animals.items():
+            animal0_win_cond = to_fight_animals[0].carnivorism - 2*0.2 < to_fight_animals[1].carnivorism < to_fight_animals[0].carnivorism - 0.2
+            animal1_win_cond = to_fight_animals[1].carnivorism - 2*0.2 < to_fight_animals[0].carnivorism < to_fight_animals[1].carnivorism - 0.2
+            if animal0_win_cond:
                 to_fight_animals[1].health = 0
-                to_fight_animals[0].gain_satiation()
-            elif to_fight_animals[1].carnivorism > to_fight_animals[0].carnivorism and to_fight_animals[1].carnivorism > 0.5 and to_fight_animals[0].carnivorism < 0.5:
+                to_fight_animals[0].gain_satiation("animal")
+            elif animal1_win_cond:
                 to_fight_animals[0].health = 0
-                to_fight_animals[1].gain_satiation()
+                to_fight_animals[1].gain_satiation("animal")
                 
     def animal_hunger(self):
         for index, current_animal in enumerate(self.animals):
-            if current_animal.satiation == 0:
+            if current_animal.satiation < 0.5:
                 current_animal.loss_health()
 
     def animal_regeneration(self):
